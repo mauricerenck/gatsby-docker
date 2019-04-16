@@ -8,11 +8,11 @@ RUN apk update && \
     apk add python && \
     rm -rf /var/cache/apk/*
 
-RUN npm install --global gatsby --no-optional gatsby@1.9 
+RUN npm install --global gatsby-cli
 
 RUN mkdir -p /site
 WORKDIR /site
-VOLUME /site
+VOLUME /
 
 COPY ./entry.sh /
 RUN chmod +x /entry.sh
