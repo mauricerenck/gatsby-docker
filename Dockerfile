@@ -1,24 +1,17 @@
-FROM node:9.5-alpine
+FROM node:alpine
 
-EXPOSE 8000
+# Also exposing VSCode debug ports
+EXPOSE 8000 9929 9230
 
-RUN apk update && \
-    apk add --update --repository http://dl-3.alpinelinux.org/alpine/edge/testing vips-tools vips-dev fftw-dev gcc g++ make libc6-compat && \
-    apk add git && \
-    apk add python && \
-    rm -rf /var/cache/apk/*
+RUN \
+  apk add --no-cache python make g++ && \
+  apk add vips-dev fftw-dev --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing --repository http://dl-3.alpinelinux.org/alpine/edge/main && \
+  rm -fR /var/cache/apk/*
 
-RUN npm install --global gatsby-cli
+RUN npm install -g gatsby-cli yarn
 
-RUN mkdir -p /site
-WORKDIR /site
-VOLUME /
-
-COPY ./entry.sh /
-RUN chmod +x /entry.sh
-ENTRYPOINT ["/entry.sh"]
-
-
-
-
-
+WORKDIR /app
+COPY ./package.json .
+RUN yarn install && yarn cache clean
+COPY . .
+CMD ["gatsby", "develop", "-H", "0.0.0.0" ]
